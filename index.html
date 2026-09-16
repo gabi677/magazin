@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aura Store — Magazin Online Premium</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+  <!-- BARĂ DE ANUNȚ SUS -->
+  <div class="announcement-bar">
+    <p>⚡ Transport GRATUIT la comenzi de peste 200 lei! Folosește codul <strong>AURA10</strong> pentru 10% reducere.</p>
+  </div>
+
+  <!-- HEADER / NAVIGAȚIE -->
+  <header class="header">
+    <div class="container nav-container">
+      <a href="#" class="logo">AURA<span>.</span></a>
+      
+      <nav class="nav-links">
+        <a href="#hero">Acasă</a>
+        <a href="#products">Colecții</a>
+        <a href="#benefits">De ce noi?</a>
+        <a href="#reviews">Recenzii</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="icon-btn" aria-label="Căutare">
+          <i data-lucide="search"></i>
+        </button>
+        <button class="icon-btn cart-btn" aria-label="Coș cumpărături">
+          <i data-lucide="shopping-bag"></i>
+          <span class="cart-badge">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO SECTION (ZONA PRINCIPALĂ) -->
+  <section id="hero" class="hero">
+    <div class="container hero-container">
+      <div class="hero-content">
+        <span class="badge">Noua Colecție 2026</span>
+        <h1>Calitate premium pentru stilul tău zilnic</h1>
+        <p>Descoperă gama noastră exclusivă de produse create cu atenție la detalii, minimalism și durabilitate.</p>
+        
+        <!-- BUTON NOU IPHONE SLIDE TO ACTION -->
+        <div class="slider-wrapper">
+          <button class="slide-to-action" id="slide-to-action">
+            <div class="slide-track-text">
+              <span>Explorează Colecția</span>
+              <i data-lucide="chevrons-right" class="shimmer-arrow"></i>
+            </div>
+            <div class="slide-handle" id="slide-handle">
+              <i data-lucide="arrow-right"></i>
+            </div>
+          </button>
+        </div>
+      </div>
+      <div class="hero-image">
+        <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop" alt="Produs Vedetă Aura">
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTIUNE DE BENEFICII -->
+  <section id="benefits" class="benefits">
+    <div class="container benefits-grid">
+      <div class="benefit-card">
+        <div class="benefit-icon"><i data-lucide="truck"></i></div>
+        <h3>Livrare Rapidă</h3>
+        <p>În 24-48h direct la ușa ta oriunde în țară.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon"><i data-lucide="shield-check"></i></div>
+        <h3>Plată 100% Securizată</h3>
+        <p>Criptare SSL și opțiuni de plată flexibile.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon"><i data-lucide="rotate-ccw"></i></div>
+        <h3>Retur Simplu 30 Zile</h3>
+        <p>Fără întrebări inutile, banii înapoi rapid.</p>
+      </div>
+      <div class="benefit-card">
+        <div class="benefit-icon"><i data-lucide="headphones"></i></div>
+        <h3>Suport Clienti 24/7</h3>
+        <p>Echipa noastră este mereu pregătită să te ajute.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUSE RECOMANDATE (GALERIE) -->
+   class="products">
+   <!-- PRODUSE RECOMANDATE (GALERIE EXTINSĂ) -->
+  <section id="products" class="products">
+    <div class="container">
+      <div class="section-header">
+        <h2>Colecția Noastră</h2>
+        <p>Descoperă gama noastră completă de produse premium create pentru stilul tău de viață.</p>
+        
+        <!-- FILTRE CATEGORII -->
+        <div class="category-filters">
+          <button class="filter-btn active" data-category="all">Toate</button>
+          <button class="filter-btn" data-category="audio">Audio</button>
+          <button class="filter-btn" data-category="gadgeturi">Gadgeturi</button>
+          <button class="filter-btn" data-category="cosmetice">Cosmetice</button>
+          <button class="filter-btn" data-category="accesorii">Accesorii</button>
+          <button class="filter-btn" data-category="lifestyle">Lifestyle</button>
+        </div>
+      </div>
+
+      <div class="products-grid">
+        <!-- Produs 1 -->
+        <div class="product-card" data-category="audio">
+          <div class="product-image">
+            <span class="tag tag-sale">-20%</span>
+            <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=600&auto=format&fit=crop" alt="Căști Wireless Aura Pro">
+            <button class="add-to-cart-btn"><i data-lucide="shopping-cart"></i> Adaugă în Coș</button>
+          </div>
+          <div class="product-info">
+            <span class="category">Audio</span>
+            <h3>Căști Wireless Aura Pro</h3>
+            <div class="price">
+              <span class="current-price">399 Lei</span>
+              <span class="old-price">499 Lei</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Produs 2 -->
+        <div class="product-card" data-category="gadgeturi">
+          <div class="product-image">
+            <span class="tag tag-new">NOU</span>
+            <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=600&auto=format&fit=crop" alt="Ceas Inteligent Minimal">
+            <button class="add-to-cart-btn"><i data-lucide="shopping-cart"></i> Adaugă în Coș</button>
+          </div>
+          <div class="product-info">
+            <span class="category">Gadgeturi</span>
+            <h3>Ceas Inteligent Minimal</h3>
+            <div class="price">
+              <span class="current-price">649 Lei</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Produs 3 -->
+        <div class="product-card" data-category="cosmetice">
+          <div class="product-image">
+            <img src="https://images.unsplash.com/photo-1585386959984-a4155224a1ad?q=80&w=600&auto=format&fit=crop" alt="Parfum Signature 50ml">
+            <button class="add-to-cart-btn"><i data-lucide="shopping-cart"></i> Adaugă în Coș</button>
+          </div>
+          <div class="product-info">
+            <span class="category">Cosmetice</span>
+            <h3>Parfum Signature 50ml</h3>
+            <div class="price">
+              <span class="current-price">280 Lei</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Produs 4 -->
+        <div class="product-card" data-category="accesorii">
+          <div class="product-image">
+            <span class="tag tag-sale">-15%</span>
+            <img src="https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=600&auto=format&fit=crop" alt="Agendă Premium Piele">
+            <button class="add-to-cart-btn"><i data-lucide="shopping-cart"></i> Adaugă în Coș</button>
+          </div>
+          <div class="product-info">
+            <span class="category">Accesorii</span>
+            <h3>Agendă Premium Piele</h3>
+            <div class="price">
+              <span class="current-price">120 Lei</span>
+              <span class="old-price">140 Lei</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Produs 5 (NOU) -->
+        <div class="product-card" data-category="audio">
+          <div class="product-image">
+            <img src="https://images.unsplash.com/photo-1545454675-3531b543be5d?q=80&w=600&auto=format&fit=crop" alt="Boxă Portabilă BassBoost">
+            <button class="add-to-cart-btn"><i data-lucide="shopping-cart"></i> Adaugă în Coș</button>
+          </div>
+          <div class="product-info">
+            <span class="category">Audio</span>
+            <h3>Boxă Portabilă BassBoost</h3>
+            <div class="price">
+              <span class="current-price">249 Lei</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Produs 6 (NOU) -->
+        <div class="product-card" data-category="lifestyle">
+          <div class="product-image">
+            <span class="tag tag-new">NOU</span>
+            <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=600&auto=format&fit=crop" alt="Ochelari de Soare Polarizați">
+            <button class="add-to-cart-btn"><i data-lucide="shopping-cart"></i> Adaugă în Coș</button>
+          </div>
+          <div class="product-info">
+            <span class="category">Lifestyle</span>
+            <h3>Ochelari de Soare Polarizați</h3>
+            <div class="price">
+              <span class="current-price">199 Lei</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Produs 7 (NOU) -->
+        <div class="product-card" data-category="lifestyle">
+          <div class="product-image">
+            <img src="https://images.unsplash.com/photo-1608231387042-66d1773070a5?q=80&w=600&auto=format&fit=crop" alt="Adidași Minimalist White">
+            <button class="add-to-cart-btn"><i data-lucide="shopping-cart"></i> Adaugă în Coș</button>
+          </div>
+          <div class="product-info">
+            <span class="category">Lifestyle</span>
+            <h3>Adidași Minimalist White</h3>
+            <div class="price">
+              <span class="current-price">420 Lei</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Produs 8 (NOU) -->
+        <div class="product-card" data-category="accesorii">
+          <div class="product-image">
+            <span class="tag tag-sale">-10%</span>
+            <img src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=600&auto=format&fit=crop" alt="Rucsac Urban Waterproof">
+            <button class="add-to-cart-btn"><i data-lucide="shopping-cart"></i> Adaugă în Coș</button>
+          </div>
+          <div class="product-info">
+            <span class="category">Accesorii</span>
+            <h3>Rucsac Urban Waterproof</h3>
+            <div class="price">
+              <span class="current-price">315 Lei</span>
+              <span class="old-price">350 Lei</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section> 
+              <span class="current-price">120 Lei</span>
+              <span class="old-price">140 Lei</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div class="footer-brand">
+        <a href="#" class="logo">AURA<span>.</span></a>
+        <p>Magazinul tău de încredere pentru produse premium și servicii fără cusur.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Navigare</h4>
+        <a href="#hero">Acasă</a>
+        <a href="#products">Produse</a>
+        <a href="#benefits">Despre Noi</a>
+      </div>
+      <div class="footer-links">
+        <h4>Legal</h4>
+        <a href="#">Termeni și Condiții</a>
+        <a href="#">Politica de Confidențialitate</a>
+        <a href="#">Politica de Retur</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Aura Store. Toate drepturile rezervate.</p>
+    </div>
+  </footer>
+
+  <!-- OVERLAY / FUNDAL SEMI-TRANSPARENT COȘ -->
+  <div id="cart-overlay" class="cart-overlay"></div>
+
+  <!-- SERTAR LATERAL COȘ -->
+  <aside id="cart-drawer" class="cart-drawer">
+    <div class="cart-header">
+      <h3>Coșul tău (<span id="cart-count-title">0</span>)</h3>
+      <button id="close-cart-btn" class="close-btn" aria-label="Închide coșul">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+
+    <div id="cart-items" class="cart-items">
+      <p class="empty-cart-msg">Coșul tău este gol.</p>
+    </div>
+
+    <div class="cart-footer">
+      <div class="cart-total-row">
+        <span>Total de plată:</span>
+        <span id="cart-total-price">0 Lei</span>
+      </div>
+      <button class="btn btn-primary checkout-btn">
+        Spre Finalizare Comandă <i data-lucide="arrow-right"></i>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Scripturi -->
+  <script>
+    lucide.createIcons();
+  </script>
+  <script src="script.js"></script>
+</body>
+</html>
