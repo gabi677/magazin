@@ -3,212 +3,255 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AURA Store - Admin Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <title>AURA Store</title>
   <style>
-    :root {
-      --bg-dark: #0a0c10;
-      --card-bg: rgba(255, 255, 255, 0.03);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --accent-gold: #e2b153;
-      --text-main: #f3f4f6;
-      --text-muted: #9ca3af;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-    body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; padding: 20px; }
-
-    .container { max-width: 1200px; margin: 0 auto; }
+    :root { --bg-color: #0f0f0f; --text-color: #ffffff; --accent: #c5a880; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; background: #fafafa; color: #111; }
+    header { background: #111; color: #fff; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+    header h1 { margin: 0; font-size: 1.5rem; letter-spacing: 2px; color: #fff; }
+    .cart-icon-btn { background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; position: relative; }
+    .badge { background: #c5a880; color: #000; border-radius: 50%; padding: 2px 6px; font-size: 0.75rem; position: absolute; top: -8px; right: -10px; font-weight: bold; }
     
-    /* Login Box */
-    #login-box {
-      max-width: 400px;
-      margin: 100px auto;
-      padding: 30px;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 16px;
-      text-align: center;
-      backdrop-filter: blur(10px);
-    }
-
-    #login-box h2 { margin-bottom: 20px; color: var(--accent-gold); }
-    #login-box input {
-      width: 100%; padding: 12px; margin-bottom: 15px;
-      border-radius: 8px; border: 1px solid var(--card-border);
-      background: rgba(255,255,255,0.05); color: #fff; text-align: center; font-size: 16px;
-    }
-
-    /* Dashboard Header */
-    .header {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 30px; border-bottom: 1px solid var(--card-border); padding-bottom: 20px;
-    }
-    .header h1 { font-size: 24px; color: var(--accent-gold); }
-
-    /* Table & Cards */
-    .orders-grid { display: grid; gap: 20px; }
-    .order-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      align-items: center;
-    }
-
-    .order-header { font-weight: bold; color: var(--accent-gold); }
-    .status-badge {
-      padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block;
-    }
-    .status-pending { background: rgba(234, 179, 8, 0.2); color: #eab308; }
-    .status-completed { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
-
-    .btn {
-      padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600;
-      transition: opacity 0.2s;
-    }
-    .btn-gold { background: var(--accent-gold); color: #000; }
-    .btn-danger { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); }
-    .btn:hover { opacity: 0.8; }
-
-    .hidden { display: none !important; }
+    .hero { text-align: center; padding: 60px 20px; background: #1a1a1a; color: #fff; }
+    .hero h2 { font-size: 2.5rem; margin-bottom: 10px; }
+    
+    .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
+    .product-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; flex-direction: column; transition: transform 0.2s; }
+    .product-card:hover { transform: translateY(-5px); }
+    .product-image { height: 240px; background: #f4f4f4; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .product-image img { width: 100%; height: 100%; object-fit: cover; }
+    .product-info { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+    .product-info h3 { margin: 0 0 10px 0; font-size: 1.1rem; }
+    .price { font-size: 1.2rem; font-weight: bold; color: #b89768; margin-bottom: 15px; }
+    
+    .product-actions { display: flex; gap: 10px; margin-top: auto; }
+    .btn-outline { background: transparent; color: #111; border: 2px solid #111; padding: 10px; width: 100%; font-size: 0.9rem; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.2s; }
+    .btn-outline:hover { background: #111; color: #fff; }
+    
+    .cart-drawer { position: fixed; top: 0; right: -400px; width: 380px; height: 100%; background: #fff; box-shadow: -5px 0 25px rgba(0,0,0,0.1); z-index: 2000; transition: right 0.3s ease; display: flex; flex-direction: column; }
+    .cart-drawer.open { right: 0; }
+    .cart-header { padding: 20px; background: #111; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+    .cart-body { padding: 20px; flex-grow: 1; overflow-y: auto; }
+    .cart-footer { padding: 20px; border-top: 1px solid #eee; background: #f9f9f9; }
+    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1500; display: none; }
+    .overlay.open { display: block; }
+    
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 3000; display: none; align-items: center; justify-content: center; }
+    .modal.open { display: flex; }
+    .modal-content { background: #fff; width: 100%; max-width: 450px; border-radius: 12px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative; max-height: 90vh; overflow-y: auto; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 0.9rem; }
+    .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
+    
+    button { cursor: pointer; border: none; border-radius: 6px; font-weight: bold; transition: background 0.2s; }
+    .btn-primary { background: #111; color: #fff; padding: 12px; width: 100%; font-size: 1rem; }
+    .btn-primary:hover { background: #333; }
+    .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #fff; }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <!-- ECRAN AUTENTIFICARE -->
-    <div id="login-box">
-      <h2>AURA Admin Login</h2>
-      <input type="password" id="admin-pass" placeholder="Introdu parola admin...">
-      <button class="btn btn-gold" style="width:100%" onclick="login()">Intră în Panou</button>
-      <p id="login-error" style="color:#ef4444; margin-top:10px; font-size:14px;" class="hidden">Parolă incorectă!</p>
+  <header>
+    <h1>AURA</h1>
+    <button class="cart-icon-btn" id="cartIcon">
+      🛒 Coș <span class="badge" id="cartCount">0</span>
+    </button>
+  </header>
+
+  <section class="hero">
+    <h2>Colecția Exclusivistă</h2>
+    <p>Calitate și design desăvârșit.</p>
+  </section>
+
+  <main class="container">
+    <div id="productsGrid" class="products-grid">
+      <p style="text-align:center; width:100%;">Se încarcă produsele...</p>
     </div>
+  </main>
 
-    <!-- PANOU COMENZI -->
-    <div id="dashboard" class="hidden">
-      <div class="header">
-        <h1>Panou Comenzi AURA</h1>
-        <div>
-          <button class="btn btn-gold" onclick="loadOrders()">🔄 Reîmprospătează</button>
-          <button class="btn btn-danger" onclick="logout()">Ieșire</button>
-        </div>
+  <div class="overlay" id="cartOverlay"></div>
+  <div class="cart-drawer" id="cartDrawer">
+    <div class="cart-header">
+      <h3>Coșul Tău</h3>
+      <button class="close-btn" id="closeCart">&times;</button>
+    </div>
+    <div class="cart-body" id="cartItemsContainer"></div>
+    <div class="cart-footer">
+      <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:1.1rem;">
+        <strong>Total:</strong>
+        <span id="cartTotal" style="font-weight:bold; color:#b89768;">0 Lei</span>
       </div>
+      <button class="btn-primary" id="openCheckoutBtn">Finalizează Comanda</button>
+    </div>
+  </div>
 
-      <div id="orders-container" class="orders-grid">
-        <p style="text-align: center; color: var(--text-muted);">Se încarcă comenzile...</p>
+  <div class="modal" id="checkoutModal">
+    <div class="modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h3 style="margin:0;">Date Livrare</h3>
+        <button id="closeCheckout" style="background:none; border:none; font-size:1.2rem; cursor:pointer;">✕</button>
+      </div>
+      
+      <div>
+        <div class="form-group">
+          <label>Nume și Prenume</label>
+          <input type="text" id="customerName" placeholder="Ion Popescu">
+        </div>
+        <div class="form-group">
+          <label>Număr Telefon</label>
+          <input type="tel" id="customerPhone" placeholder="0712345678">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="customerEmail" placeholder="ion@exemplu.com">
+        </div>
+        <div class="form-group">
+          <label>Oraș</label>
+          <input type="text" id="customerCity" placeholder="București">
+        </div>
+        <div class="form-group">
+          <label>Stradă și Număr / Adresă</label>
+          <input type="text" id="customerStreet" placeholder="Str. Exemplu, nr. 10">
+        </div>
+        
+        <button type="button" class="btn-primary" id="submitOrderBtn" style="margin-top:10px;">Trimite Comanda</button>
       </div>
     </div>
   </div>
 
-  <script>
-    // PAROLA TA DE ADMIN (o poți schimba aici)
-    const ADMIN_PASSWORD = "aura1234admin";
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script>
+  <!-- ========================================== -->
+<!-- 1. FOOTER OFICIAL AURA STORE              -->
+<!-- ========================================== -->
+<footer style="background-color: #1a202c; color: #cbd5e0; padding: 40px 20px; margin-top: 60px; font-family: sans-serif;">
+  <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
+    
+    <!-- Coloana 1: Despre PFA & Contact -->
+    <div>
+      <h3 style="color: #ffffff; margin-bottom: 15px; font-size: 18px;">Aura Store</h3>
+      <p style="font-size: 14px; line-height: 1.5; margin-bottom: 10px;">Magazin general online cu livrare rapidă din depozite partenere europene.</p>
+      <p style="font-size: 14px; margin: 5px 0;"><strong>Entitate:</strong> PFA [Numele Tău]</p>
+      <p style="font-size: 14px; margin: 5px 0;"><strong>CUI:</strong> [Codul tău fiscal]</p>
+      <p style="font-size: 14px; margin: 5px 0;"><strong>Email:</strong> contact@aurastore.ro</p>
+    </div>
 
-    // Datele tale Supabase (aceleași ca în script.js)    const SUPABASE_KEY = "INTRODU_SUPABASE_KEY_AICI";
-    const SUPABASE_URL = 'https://khgzdumptkgoxnlgpvss.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtoZ3pkdW1wdGtnb3hubGdwdnNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1NzY0NTYsImV4cCI6MjEwNTE1MjQ1Nn0.dh7pkwMrpLgJ5ENE_XYNXRdMn6cRe9L173F_RmrAZvw';
+    <!-- Coloana 2: Link-uri Utile / Legale (Deschid modalele) -->
+    <div>
+      <h3 style="color: #ffffff; margin-bottom: 15px; font-size: 18px;">Informații Legale</h3>
+      <ul style="list-style: none; padding: 0; margin: 0;">
+        <li style="margin-bottom: 10px;"><a href="javascript:void(0);" onclick="deschideModal('modal-termeni')" style="color: #cbd5e0; text-decoration: none; font-size: 14px; cursor: pointer;">Termeni și Condiții</a></li>
+        <li style="margin-bottom: 10px;"><a href="javascript:void(0);" onclick="deschideModal('modal-retur')" style="color: #cbd5e0; text-decoration: none; font-size: 14px; cursor: pointer;">Politica de Retur</a></li>
+        <li style="margin-bottom: 10px;"><a href="javascript:void(0);" onclick="deschideModal('modal-contact')" style="color: #cbd5e0; text-decoration: none; font-size: 14px; cursor: pointer;">Date Contact & PFA</a></li>
+      </ul>
+    </div>
 
-    let supabaseClient = null;
+    <!-- Coloana 3: ANPC / SOL -->
+    <div>
+      <h3 style="color: #ffffff; margin-bottom: 15px; font-size: 18px;">Protecția Consumatorului</h3>
+      <p style="font-size: 13px; line-height: 1.5; margin-bottom: 10px;">Soluționarea alternativă a litigiilor (SAL) și soluționarea online a litigiilor (SOL).</p>
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <a href="https://anpc.ro/" target="_blank" rel="nofollow" style="background: #2d3748; padding: 8px 12px; border-radius: 4px; color: #fff; text-decoration: none; font-size: 12px;">ANPC</a>
+        <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="nofollow" style="background: #2d3748; padding: 8px 12px; border-radius: 4px; color: #fff; text-decoration: none; font-size: 12px;">Portal SOL</a>
+      </div>
+    </div>
 
-    if(SUPABASE_URL !== "INTRODU_SUPABASE_URL_AICI") {
-      supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  </div>
+
+  <div style="max-width: 1200px; margin: 30px auto 0; border-top: 1px solid #2d3748; padding-top: 20px; text-align: center; font-size: 13px; color: #a0aec0;">
+    &copy; 2026 Aura Store. Toate drepturile rezervate. Operat prin PFA [Numele Tău].
+  </div>
+</footer>
+
+
+<!-- ========================================== -->
+<!-- 2. STRUCTURA FERESTRELOR MODALE (POP-UP)   -->
+<!-- ========================================== -->
+
+<!-- Modal Termeni și Condiții -->
+<div id="modal-termeni" class="aura-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center; padding: 20px;">
+  <div style="background:#fff; color:#333; max-width:600px; width:100%; max-height:80vh; overflow-y:auto; padding:30px; border-radius:8px; position:relative; box-shadow: 0 4px 20px rgba(0,0,0,0.3); font-family: sans-serif;">
+    <button onclick="inchideModalele()" style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:20px; cursor:pointer; font-weight:bold;">&times;</button>
+    <h2 style="margin-top:0; color:#1a202c; border-bottom:2px solid #edf2f7; padding-bottom:10px;">Termeni și Condiții</h2>
+    <div style="font-size:14px; line-height:1.6; margin-top: 15px;">
+      <p>Bine ați venit pe <strong>Aura Store</strong>! Folosirea acestui site implică acceptarea termenilor și condițiilor de mai jos.</p>
+      <p><strong>1. Definiții:</strong> Activitatea este comercializată prin intermediul PFA-ului înregistrat conform legislației române. Cumpărătorul este orice persoană care plasează o comandă.</p>
+      <p><strong>2. Comanda:</strong> Contractul de vânzare-cumpărare se consideră încheiat în momentul confirmării comenzii.</p>
+      <p><strong>3. Livrarea:</strong> Livrarea se face prin curier rapid. Termenul estimat este de 3-7 zile lucrătoare, folosind depozite partenere europene.</p>
+      <p><strong>4. Prețuri:</strong> Prețurile sunt exprimate în Lei (RON) și conțin taxele aferente conform legislației în vigoare pentru PFA.</p>
+    </div>
+    <div style="text-align:right; margin-top:20px;">
+      <button onclick="inchideModalele()" style="background:#3182ce; color:#fff; border:none; padding:10px 20px; border-radius:4px; cursor:pointer;">Am înțeles</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Politica de Retur -->
+<div id="modal-retur" class="aura-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center; padding: 20px;">
+  <div style="background:#fff; color:#333; max-width:600px; width:100%; max-height:80vh; overflow-y:auto; padding:30px; border-radius:8px; position:relative; box-shadow: 0 4px 20px rgba(0,0,0,0.3); font-family: sans-serif;">
+    <button onclick="inchideModalele()" style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:20px; cursor:pointer; font-weight:bold;">&times;</button>
+    <h2 style="margin-top:0; color:#1a202c; border-bottom:2px solid #edf2f7; padding-bottom:10px;">Politica de Retur</h2>
+    <div style="font-size:14px; line-height:1.6; margin-top: 15px;">
+      <p>Conform OUG nr. 34/2014, aveți dreptul de a returna produsele în termen de <strong>14 zile calendaristice</strong> de la recepție, fără invocarea niciunui motiv.</p>
+      <p><strong>1. Condiții:</strong> Produsul trebuie să fie în aceeași stare în care a fost livrat, fără urme de uzură, cu etichetele și accesoriile intacte.</p>
+      <p><strong>2. Pași retur:</strong> Trimiteți o solicitare pe e-mail, iar noi vă vom oferi detaliile pentru expedierea coletului către depozitul partener.</p>
+      <p><strong>3. Rambursare:</strong> Banii vă vor fi returnați în contul bancar în maxim 14 zile de la primirea și verificarea produsului retur.</p>
+    </div>
+    <div style="text-align:right; margin-top:20px;">
+      <button onclick="inchideModalele()" style="background:#3182ce; color:#fff; border:none; padding:10px 20px; border-radius:4px; cursor:pointer;">Am înțeles</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Date Contact & PFA -->
+<div id="modal-contact" class="aura-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center; padding: 20px;">
+  <div style="background:#fff; color:#333; max-width:600px; width:100%; max-height:80vh; overflow-y:auto; padding:30px; border-radius:8px; position:relative; box-shadow: 0 4px 20px rgba(0,0,0,0.3); font-family: sans-serif;">
+    <button onclick="inchideModalele()" style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:20px; cursor:pointer; font-weight:bold;">&times;</button>
+    <h2 style="margin-top:0; color:#1a202c; border-bottom:2px solid #edf2f7; padding-bottom:10px;">Date Contact & PFA</h2>
+    <div style="font-size:14px; line-height:1.6; margin-top: 15px;">
+      <p>Ne puteți contacta oricând pentru întrebări legate de comenzi sau livrări:</p>
+      <ul style="padding-left: 20px; margin: 10px 0;">
+        <li><strong>Entitate juridică:</strong> PFA [Numele Tău]</li>
+        <li><strong>CUI (Cod Unic de Înregistrare):</strong> [Codul tău fiscal]</li>
+        <li><strong>Email suport:</strong> contact@aurastore.ro</li>
+        <li><strong>Program de lucru:</strong> Luni – Vineri (09:00 - 17:00)</li>
+      </ul>
+    </div>
+    <div style="text-align:right; margin-top:20px;">
+      <button onclick="inchideModalele()" style="background:#3182ce; color:#fff; border:none; padding:10px 20px; border-radius:4px; cursor:pointer;">Închide</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ========================================== -->
+<!-- 3. SCRIPTUL JAVASCRIPT PENTRU MODALE       -->
+<!-- ========================================== -->
+<script>
+  function deschideModal(idModal) {
+    // Ascunde orice alt modal deschis anterior
+    const modale = document.querySelectorAll('.aura-modal');
+    modale.forEach(m => m.style.display = 'none');
+    
+    // Afișează modalul cerut
+    const modalSelectat = document.getElementById(idModal);
+    if (modalSelectat) {
+      modalSelectat.style.display = 'flex';
     }
+  }
 
-    function login() {
-      const pass = document.getElementById('admin-pass').value;
-      if(pass === ADMIN_PASSWORD) {
-        document.getElementById('login-box').classList.add('hidden');
-        document.getElementById('dashboard').classList.remove('hidden');
-        loadOrders();
-      } else {
-        document.getElementById('login-error').classList.remove('hidden');
-      }
+  function inchideModalele() {
+    const modale = document.querySelectorAll('.aura-modal');
+    modale.forEach(m => m.style.display = 'none');
+  }
+
+  // Permite închiderea modalului și prin apăsarea tastei ESC sau click în afara ferestrei
+  window.onclick = function(event) {
+    if (event.target.classList.contains('aura-modal')) {
+      inchideModalele();
     }
-
-    function logout() {
-      document.getElementById('dashboard').classList.add('hidden');
-      document.getElementById('login-box').classList.remove('hidden');
-      document.getElementById('admin-pass').value = '';
-    }
-
-    async function loadOrders() {
-      const container = document.getElementById('orders-container');
-      container.innerHTML = '<p style="text-align:center;">Se încarcă...</p>';
-
-      if(!supabaseClient) {
-        container.innerHTML = '<p style="color:#ef4444; text-align:center;">Supabase nu este configurat în admin.html!</p>';
-        return;
-      }
-
-      const { data: orders, error } = await supabaseClient
-        .from('orders')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if(error) {
-        container.innerHTML = `<p style="color:#ef4444;">Eroare la preluarea comenzilor: ${error.message}</p>`;
-        return;
-      }
-
-      if(!orders || orders.length === 0) {
-        container.innerHTML = '<p style="text-align:center; color:var(--text-muted);">Nu există comenzi înregistrate momentan.</p>';
-        return;
-      }
-
-      container.innerHTML = orders.map(order => {
-        const date = new Date(order.created_at).toLocaleString('ro-RO');
-        const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
-        const itemsList = Array.isArray(items) 
-          ? items.map(i => `${i.name} x${i.quantity}`).join(', ')
-          : 'Detalii indisponibile';
-
-        return `
-          <div class="order-card">
-            <div>
-              <div class="order-header">Comanda #${order.id}</div>
-              <div style="font-size:12px; color:var(--text-muted);">${date}</div>
-            </div>
-            <div>
-              <strong>${order.full_name || order.customer_name || 'Nespecificat'}</strong><br>
-              📞 ${order.phone || 'Fără telefon'}<br>
-              📧 ${order.email || ''}
-            </div>
-            <div>
-              📍 ${order.address || ''}, ${order.city || ''}, ${order.county || ''}
-            </div>
-            <div>
-              🛒 <strong>${itemsList}</strong>
-            </div>
-            <div>
-              💰 <strong style="color:var(--accent-gold); font-size:18px;">${order.total_price || order.total} RON</strong>
-            </div>
-            <div>
-              <button class="btn btn-danger" onclick="deleteOrder(${order.id})">Șterge</button>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    async function deleteOrder(id) {
-      if(!confirm(`Sigur vrei să ștergi comanda #${id}?`)) return;
-
-      const { error } = await supabaseClient
-        .from('orders')
-        .delete()
-        .eq('id', id);
-
-      if(error) {
-        alert('Eroare la ștergere: ' + error.message);
-      } else {
-        loadOrders();
-      }
-    }
-  </script>
+  }
+</script>
 </body>
 </html>
