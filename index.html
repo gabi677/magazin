@@ -1,319 +1,257 @@
 <!DOCTYPE html>
 <html lang="ro">
-<head><!-- Supabase JS Client -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aura Store — Magazin Online Premium</title>
-  <link rel="stylesheet" href="style.css">
-  <!-- Google Fonts: Inter & Plus Jakarta Sans -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <title>AURA Store</title>
+  <style>
+    :root { --bg-color: #0f0f0f; --text-color: #ffffff; --accent: #c5a880; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; background: #fafafa; color: #111; }
+    header { background: #111; color: #fff; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; }
+    header h1 { margin: 0; font-size: 1.5rem; letter-spacing: 2px; color: #fff; }
+    .cart-icon-btn { background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; position: relative; }
+    .badge { background: #c5a880; color: #000; border-radius: 50%; padding: 2px 6px; font-size: 0.75rem; position: absolute; top: -8px; right: -10px; font-weight: bold; }
+    
+    .hero { text-align: center; padding: 60px 20px; background: #1a1a1a; color: #fff; }
+    .hero h2 { font-size: 2.5rem; margin-bottom: 10px; }
+    
+    .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; }
+    .product-card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; flex-direction: column; transition: transform 0.2s; }
+    .product-card:hover { transform: translateY(-5px); }
+    .product-image { height: 240px; background: #f4f4f4; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .product-image img { width: 100%; height: 100%; object-fit: cover; }
+    .product-info { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+    .product-info h3 { margin: 0 0 10px 0; font-size: 1.1rem; }
+    .price { font-size: 1.2rem; font-weight: bold; color: #b89768; margin-bottom: 15px; }
+    
+    .product-actions { display: flex; gap: 10px; margin-top: auto; }
+    .btn-outline { background: transparent; color: #111; border: 2px solid #111; padding: 10px; width: 100%; font-size: 0.9rem; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.2s; }
+    .btn-outline:hover { background: #111; color: #fff; }
+    
+    .cart-drawer { position: fixed; top: 0; right: -400px; width: 380px; height: 100%; background: #fff; box-shadow: -5px 0 25px rgba(0,0,0,0.1); z-index: 2000; transition: right 0.3s ease; display: flex; flex-direction: column; }
+    .cart-drawer.open { right: 0; }
+    .cart-header { padding: 20px; background: #111; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+    .cart-body { padding: 20px; flex-grow: 1; overflow-y: auto; }
+    .cart-footer { padding: 20px; border-top: 1px solid #eee; background: #f9f9f9; }
+    .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1500; display: none; }
+    .overlay.open { display: block; }
+    
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 3000; display: none; align-items: center; justify-content: center; }
+    .modal.open { display: flex; }
+    .modal-content { background: #fff; width: 100%; max-width: 450px; border-radius: 12px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: relative; max-height: 90vh; overflow-y: auto; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; margin-bottom: 5px; font-weight: 500; font-size: 0.9rem; }
+    .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
+    
+    button { cursor: pointer; border: none; border-radius: 6px; font-weight: bold; transition: background 0.2s; }
+    .btn-primary { background: #111; color: #fff; padding: 12px; width: 100%; font-size: 1rem; }
+    .btn-primary:hover { background: #333; }
+    .close-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #fff; }
+  </style>
 </head>
 <body>
 
-  <!-- BARĂ DE ANUNȚ SUS -->
-  <div class="announcement-bar">
-    <p>⚡ Transport GRATUIT la comenzi de peste 200 lei! Folosește codul <strong>AURA10</strong> pentru 10% reducere.</p>
-  </div>
-
-  <!-- HEADER / NAVIGAȚIE -->
-  <header class="header">
-    <div class="container nav-container">
-      <a href="#" class="logo">AURA<span>.</span></a>
-      
-      <nav class="nav-links">
-        <a href="#hero">Acasă</a>
-        <a href="#products">Colecții</a>
-        <a href="#benefits">De ce noi?</a>
-        <a href="#reviews">Recenzii</a>
-      </nav>
-
-      <div class="nav-actions">
-        <button class="icon-btn" aria-label="Căutare">
-          <i data-lucide="search"></i>
-        </button>
-        <button class="icon-btn cart-btn" aria-label="Coș cumpărături">
-          <i data-lucide="shopping-bag"></i>
-          <span class="cart-badge">0</span>
-        </button>
-      </div>
-    </div>
+  <header>
+    <h1>AURA</h1>
+    <button class="cart-icon-btn" id="cartIcon">
+      🛒 Coș <span class="badge" id="cartCount">0</span>
+    </button>
   </header>
 
-  <!-- HERO SECTION (ZONA PRINCIPALĂ) -->
-  <section id="hero" class="hero">
-    <div class="container hero-container">
-      <div class="hero-content">
-        <span class="badge">Noua Colecție 2026</span>
-        <h1>Calitate premium pentru stilul tău zilnic</h1>
-        <p>Descoperă gama noastră exclusivă de produse create cu atenție la detalii, minimalism și durabilitate.</p>
-        
-        <!-- BUTON NOU IPHONE SLIDE TO ACTION -->
-        <div class="slider-wrapper">
-          <button class="slide-to-action" id="slide-to-action">
-            <div class="slide-track-text">
-              <span>Explorează Colecția</span>
-              <i data-lucide="chevrons-right" class="shimmer-arrow"></i>
-            </div>
-            <div class="slide-handle" id="slide-handle">
-              <i data-lucide="arrow-right"></i>
-            </div>
-          </button>
-        </div>
-      </div>
-      <div class="hero-image">
-        <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1000&auto=format&fit=crop" alt="Produs Vedetă Aura">
-      </div>
-    </div>
+  <section class="hero">
+    <h2>Colecția Exclusivistă</h2>
+    <p>Calitate și design desăvârșit.</p>
   </section>
 
-  <!-- SECTIUNE DE BENEFICII -->
-  <section id="benefits" class="benefits">
-    <div class="container benefits-grid">
-      <div class="benefit-card">
-        <div class="benefit-icon"><i data-lucide="truck"></i></div>
-        <h3>Livrare Rapidă</h3>
-        <p>În 24-48h direct la ușa ta oriunde în țară.</p>
-      </div>
-      <div class="benefit-card">
-        <div class="benefit-icon"><i data-lucide="shield-check"></i></div>
-        <h3>Plată 100% Securizată</h3>
-        <p>Criptare SSL și opțiuni de plată flexibile.</p>
-      </div>
-      <div class="benefit-card">
-        <div class="benefit-icon"><i data-lucide="rotate-ccw"></i></div>
-        <h3>Retur Simplu 30 Zile</h3>
-        <p>Fără întrebări inutile, banii înapoi rapid.</p>
-      </div>
-      <div class="benefit-card">
-        <div class="benefit-icon"><i data-lucide="headphones"></i></div>
-        <h3>Suport Clienti 24/7</h3>
-        <p>Echipa noastră este mereu pregătită să te ajute.</p>
-      </div>
+  <main class="container">
+    <div id="productsGrid" class="products-grid">
+      <p style="text-align:center; width:100%;">Se încarcă produsele...</p>
     </div>
-  </section>
+  </main>
 
-  <!-- PRODUSE RECOMANDATE (GALERIE) -->
-   class="products">
-   <!-- PRODUSE RECOMANDATE (GALERIE EXTINSĂ) -->
-  <section id="products" class="products">
-    <div class="container">
-      <div class="section-header">
-        <h2>Colecția Noastră</h2>
-        <p>Descoperă gama noastră completă de produse premium create pentru stilul tău de viață.</p>
-        
-        <!-- FILTRE CATEGORII -->
-        <div class="category-filters">
-          <button class="filter-btn active" data-category="all">Toate</button>
-          <button class="filter-btn" data-category="audio">Audio</button>
-          <button class="filter-btn" data-category="gadgeturi">Gadgeturi</button>
-          <button class="filter-btn" data-category="cosmetice">Cosmetice</button>
-          <button class="filter-btn" data-category="accesorii">Accesorii</button>
-          <button class="filter-btn" data-category="lifestyle">Lifestyle</button>
-        </div>
-      </div>
-
-      <div class="products-grid">
-        <!-- Produs 1 -->
-        <div class="product-card" data-category="audio">
-          <div class="product-image">
-            <span class="tag tag-sale">-20%</span>
-            <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=600&auto=format&fit=crop" alt="Căști Wireless Aura Pro">
-            <button class="add-to-cart-btn"><i data-lucide="shopping-cart"></i> Adaugă în Coș</button>
-          </div>
-          <div class="product-info">
-            <span class="category">Audio</span>
-            <h3>Căști Wireless Aura Pro</h3>
-            <div class="price">
-              <span class="current-price">399 Lei</span>
-              <span class="old-price">499 Lei</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Produs 2 -->
-        <div class="product-card" data-category="gadgeturi">
-          <div class="product-image">
-            <span class="tag tag-new">NOU</span>
-            <img src="https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=600&auto=format&fit=crop" alt="Ceas Inteligent Minimal">
-            <button class="add-to-cart-btn"><i data-lucide="shopping-cart"></i> Adaugă în Coș</button>
-          </div>
-          <div class="product-info">
-            <span class="category">Gadgeturi</span>
-            <h3>Ceas Inteligent Minimal</h3>
-            <div class="price">
-              <span class="current-price">649 Lei</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Produs 3 -->
-        <div class="product-card" data-category="cosmetice">
-          <div class="product-image">
-            <img src="https://images.unsplash.com/photo-1585386959984-a4155224a1ad?q=80&w=600&auto=format&fit=crop" alt="Parfum Signature 50ml">
-            <button class="add-to-cart-btn"><i data-lucide="shopping-cart"></i> Adaugă în Coș</button>
-          </div>
-          <div class="product-info">
-            <span class="category">Cosmetice</span>
-            <h3>Parfum Signature 50ml</h3>
-            <div class="price">
-              <span class="current-price">280 Lei</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Produs 4 -->
-        <div class="product-card" data-category="accesorii">
-          <div class="product-image">
-            <span class="tag tag-sale">-15%</span>
-            <img src="https://images.unsplash.com/photo-1544816155-12df9643f363?q=80&w=600&auto=format&fit=crop" alt="Agendă Premium Piele">
-            <button class="add-to-cart-btn"><i data-lucide="shopping-cart"></i> Adaugă în Coș</button>
-          </div>
-          <div class="product-info">
-            <span class="category">Accesorii</span>
-            <h3>Agendă Premium Piele</h3>
-            <div class="price">
-              <span class="current-price">120 Lei</span>
-              <span class="old-price">140 Lei</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Produs 5 (NOU) -->
-        <div class="product-card" data-category="audio">
-          <div class="product-image">
-            <img src="https://images.unsplash.com/photo-1545454675-3531b543be5d?q=80&w=600&auto=format&fit=crop" alt="Boxă Portabilă BassBoost">
-            <button class="add-to-cart-btn"><i data-lucide="shopping-cart"></i> Adaugă în Coș</button>
-          </div>
-          <div class="product-info">
-            <span class="category">Audio</span>
-            <h3>Boxă Portabilă BassBoost</h3>
-            <div class="price">
-              <span class="current-price">249 Lei</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Produs 6 (NOU) -->
-        <div class="product-card" data-category="lifestyle">
-          <div class="product-image">
-            <span class="tag tag-new">NOU</span>
-            <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=600&auto=format&fit=crop" alt="Ochelari de Soare Polarizați">
-            <button class="add-to-cart-btn"><i data-lucide="shopping-cart"></i> Adaugă în Coș</button>
-          </div>
-          <div class="product-info">
-            <span class="category">Lifestyle</span>
-            <h3>Ochelari de Soare Polarizați</h3>
-            <div class="price">
-              <span class="current-price">199 Lei</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Produs 7 (NOU) -->
-        <div class="product-card" data-category="lifestyle">
-          <div class="product-image">
-            <img src="https://images.unsplash.com/photo-1608231387042-66d1773070a5?q=80&w=600&auto=format&fit=crop" alt="Adidași Minimalist White">
-            <button class="add-to-cart-btn"><i data-lucide="shopping-cart"></i> Adaugă în Coș</button>
-          </div>
-          <div class="product-info">
-            <span class="category">Lifestyle</span>
-            <h3>Adidași Minimalist White</h3>
-            <div class="price">
-              <span class="current-price">420 Lei</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Produs 8 (NOU) -->
-        <div class="product-card" data-category="accesorii">
-          <div class="product-image">
-            <span class="tag tag-sale">-10%</span>
-            <img src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=600&auto=format&fit=crop" alt="Rucsac Urban Waterproof">
-            <button class="add-to-cart-btn"><i data-lucide="shopping-cart"></i> Adaugă în Coș</button>
-          </div>
-          <div class="product-info">
-            <span class="category">Accesorii</span>
-            <h3>Rucsac Urban Waterproof</h3>
-            <div class="price">
-              <span class="current-price">315 Lei</span>
-              <span class="old-price">350 Lei</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </section> 
-              <span class="current-price">120 Lei</span>
-              <span class="old-price">140 Lei</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div class="container footer-content">
-      <div class="footer-brand">
-        <a href="#" class="logo">AURA<span>.</span></a>
-        <p>Magazinul tău de încredere pentru produse premium și servicii fără cusur.</p>
-      </div>
-      <div class="footer-links">
-        <h4>Navigare</h4>
-        <a href="#hero">Acasă</a>
-        <a href="#products">Produse</a>
-        <a href="#benefits">Despre Noi</a>
-      </div>
-      <div class="footer-links">
-        <h4>Legal</h4>
-        <a href="#">Termeni și Condiții</a>
-        <a href="#">Politica de Confidențialitate</a>
-        <a href="#">Politica de Retur</a>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>&copy; 2026 Aura Store. Toate drepturile rezervate.</p>
-    </div>
-  </footer>
-
-  <!-- OVERLAY / FUNDAL SEMI-TRANSPARENT COȘ -->
-  <div id="cart-overlay" class="cart-overlay"></div>
-
-  <!-- SERTAR LATERAL COȘ -->
-  <aside id="cart-drawer" class="cart-drawer">
+  <div class="overlay" id="cartOverlay"></div>
+  <div class="cart-drawer" id="cartDrawer">
     <div class="cart-header">
-      <h3>Coșul tău (<span id="cart-count-title">0</span>)</h3>
-      <button id="close-cart-btn" class="close-btn" aria-label="Închide coșul">
-        <i data-lucide="x"></i>
-      </button>
+      <h3>Coșul Tău</h3>
+      <button class="close-btn" id="closeCart">&times;</button>
     </div>
-
-    <div id="cart-items" class="cart-items">
-      <p class="empty-cart-msg">Coșul tău este gol.</p>
-    </div>
-
+    <div class="cart-body" id="cartItemsContainer"></div>
     <div class="cart-footer">
-      <div class="cart-total-row">
-        <span>Total de plată:</span>
-        <span id="cart-total-price">0 Lei</span>
+      <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:1.1rem;">
+        <strong>Total:</strong>
+        <span id="cartTotal" style="font-weight:bold; color:#b89768;">0 Lei</span>
       </div>
-      <button class="btn btn-primary checkout-btn">
-        Spre Finalizare Comandă <i data-lucide="arrow-right"></i>
-      </button>
+      <button class="btn-primary" id="openCheckoutBtn">Finalizează Comanda</button>
     </div>
-  </aside>
+  </div>
 
-  <!-- Scripturi -->
-  <script>
-    lucide.createIcons();
-  </script>
+  <div class="modal" id="checkoutModal">
+    <div class="modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h3 style="margin:0;">Date Livrare</h3>
+        <button id="closeCheckout" style="background:none; border:none; font-size:1.2rem; cursor:pointer;">✕</button>
+      </div>
+      
+      <div>
+        <div class="form-group">
+          <label>Nume și Prenume</label>
+          <input type="text" id="customerName" placeholder="Ion Popescu">
+        </div>
+        <div class="form-group">
+          <label>Număr Telefon</label>
+          <input type="tel" id="customerPhone" placeholder="0712345678">
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="customerEmail" placeholder="ion@exemplu.com">
+        </div>
+        <div class="form-group">
+          <label>Oraș</label>
+          <input type="text" id="customerCity" placeholder="București">
+        </div>
+        <div class="form-group">
+          <label>Stradă și Număr / Adresă</label>
+          <input type="text" id="customerStreet" placeholder="Str. Exemplu, nr. 10">
+        </div>
+        
+        <button type="button" class="btn-primary" id="submitOrderBtn" style="margin-top:10px;">Trimite Comanda</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="script.js"></script>
+  <!-- ========================================== -->
+<!-- 1. FOOTER OFICIAL AURA STORE              -->
+<!-- ========================================== -->
+<footer style="background-color: #1a202c; color: #cbd5e0; padding: 40px 20px; margin-top: 60px; font-family: sans-serif;">
+  <div style="max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
+    
+    <!-- Coloana 1: Despre PFA & Contact -->
+    <div>
+      <h3 style="color: #ffffff; margin-bottom: 15px; font-size: 18px;">Aura Store</h3>
+      <p style="font-size: 14px; line-height: 1.5; margin-bottom: 10px;">Magazin general online cu livrare rapidă din depozite partenere europene.</p>
+      <p style="font-size: 14px; margin: 5px 0;"><strong>Entitate:</strong> PFA [Numele Tău]</p>
+      <p style="font-size: 14px; margin: 5px 0;"><strong>CUI:</strong> [Codul tău fiscal]</p>
+      <p style="font-size: 14px; margin: 5px 0;"><strong>Email:</strong> contact@aurastore.ro</p>
+    </div>
+
+    <!-- Coloana 2: Link-uri Utile / Legale (Deschid modalele) -->
+    <div>
+      <h3 style="color: #ffffff; margin-bottom: 15px; font-size: 18px;">Informații Legale</h3>
+      <ul style="list-style: none; padding: 0; margin: 0;">
+        <li style="margin-bottom: 10px;"><a href="javascript:void(0);" onclick="deschideModal('modal-termeni')" style="color: #cbd5e0; text-decoration: none; font-size: 14px; cursor: pointer;">Termeni și Condiții</a></li>
+        <li style="margin-bottom: 10px;"><a href="javascript:void(0);" onclick="deschideModal('modal-retur')" style="color: #cbd5e0; text-decoration: none; font-size: 14px; cursor: pointer;">Politica de Retur</a></li>
+        <li style="margin-bottom: 10px;"><a href="javascript:void(0);" onclick="deschideModal('modal-contact')" style="color: #cbd5e0; text-decoration: none; font-size: 14px; cursor: pointer;">Date Contact & PFA</a></li>
+      </ul>
+    </div>
+
+    <!-- Coloana 3: ANPC / SOL -->
+    <div>
+      <h3 style="color: #ffffff; margin-bottom: 15px; font-size: 18px;">Protecția Consumatorului</h3>
+      <p style="font-size: 13px; line-height: 1.5; margin-bottom: 10px;">Soluționarea alternativă a litigiilor (SAL) și soluționarea online a litigiilor (SOL).</p>
+      <div style="display: flex; gap: 10px; margin-top: 10px;">
+        <a href="https://anpc.ro/" target="_blank" rel="nofollow" style="background: #2d3748; padding: 8px 12px; border-radius: 4px; color: #fff; text-decoration: none; font-size: 12px;">ANPC</a>
+        <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="nofollow" style="background: #2d3748; padding: 8px 12px; border-radius: 4px; color: #fff; text-decoration: none; font-size: 12px;">Portal SOL</a>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="max-width: 1200px; margin: 30px auto 0; border-top: 1px solid #2d3748; padding-top: 20px; text-align: center; font-size: 13px; color: #a0aec0;">
+    &copy; 2026 Aura Store. Toate drepturile rezervate. Operat prin PFA [Numele Tău].
+  </div>
+</footer>
+
+
+<!-- ========================================== -->
+<!-- 2. STRUCTURA FERESTRELOR MODALE (POP-UP)   -->
+<!-- ========================================== -->
+
+<!-- Modal Termeni și Condiții -->
+<div id="modal-termeni" class="aura-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center; padding: 20px;">
+  <div style="background:#fff; color:#333; max-width:600px; width:100%; max-height:80vh; overflow-y:auto; padding:30px; border-radius:8px; position:relative; box-shadow: 0 4px 20px rgba(0,0,0,0.3); font-family: sans-serif;">
+    <button onclick="inchideModalele()" style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:20px; cursor:pointer; font-weight:bold;">&times;</button>
+    <h2 style="margin-top:0; color:#1a202c; border-bottom:2px solid #edf2f7; padding-bottom:10px;">Termeni și Condiții</h2>
+    <div style="font-size:14px; line-height:1.6; margin-top: 15px;">
+      <p>Bine ați venit pe <strong>Aura Store</strong>! Folosirea acestui site implică acceptarea termenilor și condițiilor de mai jos.</p>
+      <p><strong>1. Definiții:</strong> Activitatea este comercializată prin intermediul PFA-ului înregistrat conform legislației române. Cumpărătorul este orice persoană care plasează o comandă.</p>
+      <p><strong>2. Comanda:</strong> Contractul de vânzare-cumpărare se consideră încheiat în momentul confirmării comenzii.</p>
+      <p><strong>3. Livrarea:</strong> Livrarea se face prin curier rapid. Termenul estimat este de 3-7 zile lucrătoare, folosind depozite partenere europene.</p>
+      <p><strong>4. Prețuri:</strong> Prețurile sunt exprimate în Lei (RON) și conțin taxele aferente conform legislației în vigoare pentru PFA.</p>
+    </div>
+    <div style="text-align:right; margin-top:20px;">
+      <button onclick="inchideModalele()" style="background:#3182ce; color:#fff; border:none; padding:10px 20px; border-radius:4px; cursor:pointer;">Am înțeles</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Politica de Retur -->
+<div id="modal-retur" class="aura-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center; padding: 20px;">
+  <div style="background:#fff; color:#333; max-width:600px; width:100%; max-height:80vh; overflow-y:auto; padding:30px; border-radius:8px; position:relative; box-shadow: 0 4px 20px rgba(0,0,0,0.3); font-family: sans-serif;">
+    <button onclick="inchideModalele()" style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:20px; cursor:pointer; font-weight:bold;">&times;</button>
+    <h2 style="margin-top:0; color:#1a202c; border-bottom:2px solid #edf2f7; padding-bottom:10px;">Politica de Retur</h2>
+    <div style="font-size:14px; line-height:1.6; margin-top: 15px;">
+      <p>Conform OUG nr. 34/2014, aveți dreptul de a returna produsele în termen de <strong>14 zile calendaristice</strong> de la recepție, fără invocarea niciunui motiv.</p>
+      <p><strong>1. Condiții:</strong> Produsul trebuie să fie în aceeași stare în care a fost livrat, fără urme de uzură, cu etichetele și accesoriile intacte.</p>
+      <p><strong>2. Pași retur:</strong> Trimiteți o solicitare pe e-mail, iar noi vă vom oferi detaliile pentru expedierea coletului către depozitul partener.</p>
+      <p><strong>3. Rambursare:</strong> Banii vă vor fi returnați în contul bancar în maxim 14 zile de la primirea și verificarea produsului retur.</p>
+    </div>
+    <div style="text-align:right; margin-top:20px;">
+      <button onclick="inchideModalele()" style="background:#3182ce; color:#fff; border:none; padding:10px 20px; border-radius:4px; cursor:pointer;">Am înțeles</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Date Contact & PFA -->
+<div id="modal-contact" class="aura-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center; padding: 20px;">
+  <div style="background:#fff; color:#333; max-width:600px; width:100%; max-height:80vh; overflow-y:auto; padding:30px; border-radius:8px; position:relative; box-shadow: 0 4px 20px rgba(0,0,0,0.3); font-family: sans-serif;">
+    <button onclick="inchideModalele()" style="position:absolute; top:15px; right:15px; background:none; border:none; font-size:20px; cursor:pointer; font-weight:bold;">&times;</button>
+    <h2 style="margin-top:0; color:#1a202c; border-bottom:2px solid #edf2f7; padding-bottom:10px;">Date Contact & PFA</h2>
+    <div style="font-size:14px; line-height:1.6; margin-top: 15px;">
+      <p>Ne puteți contacta oricând pentru întrebări legate de comenzi sau livrări:</p>
+      <ul style="padding-left: 20px; margin: 10px 0;">
+        <li><strong>Entitate juridică:</strong> PFA [Numele Tău]</li>
+        <li><strong>CUI (Cod Unic de Înregistrare):</strong> [Codul tău fiscal]</li>
+        <li><strong>Email suport:</strong> contact@aurastore.ro</li>
+        <li><strong>Program de lucru:</strong> Luni – Vineri (09:00 - 17:00)</li>
+      </ul>
+    </div>
+    <div style="text-align:right; margin-top:20px;">
+      <button onclick="inchideModalele()" style="background:#3182ce; color:#fff; border:none; padding:10px 20px; border-radius:4px; cursor:pointer;">Închide</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ========================================== -->
+<!-- 3. SCRIPTUL JAVASCRIPT PENTRU MODALE       -->
+<!-- ========================================== -->
+<script>
+  function deschideModal(idModal) {
+    // Ascunde orice alt modal deschis anterior
+    const modale = document.querySelectorAll('.aura-modal');
+    modale.forEach(m => m.style.display = 'none');
+    
+    // Afișează modalul cerut
+    const modalSelectat = document.getElementById(idModal);
+    if (modalSelectat) {
+      modalSelectat.style.display = 'flex';
+    }
+  }
+
+  function inchideModalele() {
+    const modale = document.querySelectorAll('.aura-modal');
+    modale.forEach(m => m.style.display = 'none');
+  }
+
+  // Permite închiderea modalului și prin apăsarea tastei ESC sau click în afara ferestrei
+  window.onclick = function(event) {
+    if (event.target.classList.contains('aura-modal')) {
+      inchideModalele();
+    }
+  }
+</script>
 </body>
 </html>
