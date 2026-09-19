@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AURA Store - Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --bg-dark: #0a0c10;
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --accent-gold: #e2b153;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    body { background-color: var(--bg-dark); color: var(--text-main); min-height: 100vh; padding: 20px; }
+
+    .container { max-width: 1200px; margin: 0 auto; }
+    
+    /* Login Box */
+    #login-box {
+      max-width: 400px;
+      margin: 100px auto;
+      padding: 30px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+
+    #login-box h2 { margin-bottom: 20px; color: var(--accent-gold); }
+    #login-box input {
+      width: 100%; padding: 12px; margin-bottom: 15px;
+      border-radius: 8px; border: 1px solid var(--card-border);
+      background: rgba(255,255,255,0.05); color: #fff; text-align: center; font-size: 16px;
+    }
+
+    /* Dashboard Header */
+    .header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 30px; border-bottom: 1px solid var(--card-border); padding-bottom: 20px;
+    }
+    .header h1 { font-size: 24px; color: var(--accent-gold); }
+
+    /* Table & Cards */
+    .orders-grid { display: grid; gap: 20px; }
+    .order-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      align-items: center;
+    }
+
+    .order-header { font-weight: bold; color: var(--accent-gold); }
+    .status-badge {
+      padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block;
+    }
+    .status-pending { background: rgba(234, 179, 8, 0.2); color: #eab308; }
+    .status-completed { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
+
+    .btn {
+      padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600;
+      transition: opacity 0.2s;
+    }
+    .btn-gold { background: var(--accent-gold); color: #000; }
+    .btn-danger { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .btn:hover { opacity: 0.8; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- ECRAN AUTENTIFICARE -->
+    <div id="login-box">
+      <h2>AURA Admin Login</h2>
+      <input type="password" id="admin-pass" placeholder="Introdu parola admin...">
+      <button class="btn btn-gold" style="width:100%" onclick="login()">Intră în Panou</button>
+      <p id="login-error" style="color:#ef4444; margin-top:10px; font-size:14px;" class="hidden">Parolă incorectă!</p>
+    </div>
+
+    <!-- PANOU COMENZI -->
+    <div id="dashboard" class="hidden">
+      <div class="header">
+        <h1>Panou Comenzi AURA</h1>
+        <div>
+          <button class="btn btn-gold" onclick="loadOrders()">🔄 Reîmprospătează</button>
+          <button class="btn btn-danger" onclick="logout()">Ieșire</button>
+        </div>
+      </div>
+
+      <div id="orders-container" class="orders-grid">
+        <p style="text-align: center; color: var(--text-muted);">Se încarcă comenzile...</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // PAROLA TA DE ADMIN (o poți schimba aici)
+    const ADMIN_PASSWORD = "aura1234admin";
+
+    // Datele tale Supabase (aceleași ca în script.js)    const SUPABASE_KEY = "INTRODU_SUPABASE_KEY_AICI";
+    const SUPABASE_URL = 'https://khgzdumptkgoxnlgpvss.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtoZ3pkdW1wdGtnb3hubGdwdnNzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1NzY0NTYsImV4cCI6MjEwNTE1MjQ1Nn0.dh7pkwMrpLgJ5ENE_XYNXRdMn6cRe9L173F_RmrAZvw';
+
+    let supabaseClient = null;
+
+    if(SUPABASE_URL !== "INTRODU_SUPABASE_URL_AICI") {
+      supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    }
+
+    function login() {
+      const pass = document.getElementById('admin-pass').value;
+      if(pass === ADMIN_PASSWORD) {
+        document.getElementById('login-box').classList.add('hidden');
+        document.getElementById('dashboard').classList.remove('hidden');
+        loadOrders();
+      } else {
+        document.getElementById('login-error').classList.remove('hidden');
+      }
+    }
+
+    function logout() {
+      document.getElementById('dashboard').classList.add('hidden');
+      document.getElementById('login-box').classList.remove('hidden');
+      document.getElementById('admin-pass').value = '';
+    }
+
+    async function loadOrders() {
+      const container = document.getElementById('orders-container');
+      container.innerHTML = '<p style="text-align:center;">Se încarcă...</p>';
+
+      if(!supabaseClient) {
+        container.innerHTML = '<p style="color:#ef4444; text-align:center;">Supabase nu este configurat în admin.html!</p>';
+        return;
+      }
+
+      const { data: orders, error } = await supabaseClient
+        .from('orders')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if(error) {
+        container.innerHTML = `<p style="color:#ef4444;">Eroare la preluarea comenzilor: ${error.message}</p>`;
+        return;
+      }
+
+      if(!orders || orders.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:var(--text-muted);">Nu există comenzi înregistrate momentan.</p>';
+        return;
+      }
+
+      container.innerHTML = orders.map(order => {
+        const date = new Date(order.created_at).toLocaleString('ro-RO');
+        const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+        const itemsList = Array.isArray(items) 
+          ? items.map(i => `${i.name} x${i.quantity}`).join(', ')
+          : 'Detalii indisponibile';
+
+        return `
+          <div class="order-card">
+            <div>
+              <div class="order-header">Comanda #${order.id}</div>
+              <div style="font-size:12px; color:var(--text-muted);">${date}</div>
+            </div>
+            <div>
+              <strong>${order.full_name || order.customer_name || 'Nespecificat'}</strong><br>
+              📞 ${order.phone || 'Fără telefon'}<br>
+              📧 ${order.email || ''}
+            </div>
+            <div>
+              📍 ${order.address || ''}, ${order.city || ''}, ${order.county || ''}
+            </div>
+            <div>
+              🛒 <strong>${itemsList}</strong>
+            </div>
+            <div>
+              💰 <strong style="color:var(--accent-gold); font-size:18px;">${order.total_price || order.total} RON</strong>
+            </div>
+            <div>
+              <button class="btn btn-danger" onclick="deleteOrder(${order.id})">Șterge</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function deleteOrder(id) {
+      if(!confirm(`Sigur vrei să ștergi comanda #${id}?`)) return;
+
+      const { error } = await supabaseClient
+        .from('orders')
+        .delete()
+        .eq('id', id);
+
+      if(error) {
+        alert('Eroare la ștergere: ' + error.message);
+      } else {
+        loadOrders();
+      }
+    }
+  </script>
+</body>
+</html>
